@@ -122,6 +122,5 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("가입이 성공적으로 진행되었습니다."));
-        //test
     }
 }
