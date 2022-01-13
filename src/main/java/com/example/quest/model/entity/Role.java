@@ -1,5 +1,6 @@
-package com.example.quest.model;
+package com.example.quest.model.entity;
 
+import com.example.quest.model.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -61,7 +61,6 @@ public class TokenFilter extends OncePerRequestFilter {
     //로그인 정보에 대한 Token을 “Bearer”라는 접두사를 달았고, 접두사를 제외한 나머지 정보를 가져온다.
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7, headerAuth.length());
         }

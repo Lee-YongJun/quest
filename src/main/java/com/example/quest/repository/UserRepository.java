@@ -1,6 +1,6 @@
 package com.example.quest.repository;
 
-import com.example.quest.model.User;
+import com.example.quest.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByUsername(String username);
 
+    //이메일존재여부
+    Boolean existsByEmail(String email);
 }

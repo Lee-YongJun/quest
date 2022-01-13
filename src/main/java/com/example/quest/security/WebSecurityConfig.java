@@ -39,11 +39,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     //  필드
     @Autowired
     //스프링시큐리티 인증시에 사용.
-    //인증정보를 검색하고 존재하지않으면 exception 존재하면 객체 반환.
-    UserDetailsServiceImpl userDetailsService;
+            //인증정보를 검색하고 존재하지않으면 exception 존재하면 객체 반환.
+            UserDetailsServiceImpl userDetailsService;
     //인증인가 예외발생시 처리.
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+
     //Bean생성해주는 역할
     //OncePerRequestFilter로부터 상속받은객체, 직접 선언
     //로그인할때 객체생성 Security의 내장객체(UserDetails)가지고 인증수행.
@@ -51,11 +52,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public TokenFilter jwtTokenFilter() {
         return new TokenFilter();
     }
+
     //AuthenticationManagerBuilder를 통해 인증객체 만들어줌.
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
+
     //Bean생성해주는 역할
     //인증 수행을 위한 동작을 나타냄.
     @Bean
@@ -63,18 +66,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
     //Bean생성해주는 역할
     //Security 내장객체로 비밀번호 암호화 담당.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     //1. 접근하는 페이지가 어떤페이지인지 설정.
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //CORS는 도메인 또는 포트가 다른 서버의 자원을 요청하는 매커니즘
         //cors(): cors설정
-        //csrf(): jwt토큰 사용하므로 csrf설정 disable()처리
+        //csrf(): jwt토큰 사용하므로 csrf설정(사이트간 위조요청방지) disable()처리
         http.cors().and().csrf().disable()
                 //예외처리 작동
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
@@ -90,6 +95,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //hasRole(): 시스템상 특정권한 가진 사람만 접근가능.
                 .authorizeRequests().antMatchers("/quest/auth/**").permitAll()
                 .antMatchers("/quest/test/**").permitAll()
+                .antMatchers("/quest/notice/**").permitAll()
                 //모든 리소스를 의미하며 접근허용 리소스 및 인증후 특정 레벨의 권한을 가진 사용자만 접근가능한 리소스를 설정하고 그외 나머지 리소스들은 무조건 인증을 완료해야 접근이 가능하다.
                 .anyRequest().authenticated();
         //UsernamePasswordAuthenticationFilter 전에 jwtTokenFilter 를 적용시킨다.

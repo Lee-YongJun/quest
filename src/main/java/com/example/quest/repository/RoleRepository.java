@@ -1,7 +1,7 @@
 package com.example.quest.repository;
 
-import com.example.quest.model.ERole;
-import com.example.quest.model.Role;
+import com.example.quest.model.enums.ERole;
+import com.example.quest.model.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
