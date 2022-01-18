@@ -22,6 +22,7 @@ import com.example.quest.security.service.UserDetailsImpl;
 import com.example.quest.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -149,6 +150,10 @@ public class AuthController extends BaseController<MemberRequest, MemberResponse
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
         log.info("{}", pageable);
         return baseService.pagingRead(pageable);
+    }
+
+    public String templateTest(String str, int num, boolean flag){
+        return new String("str");
     }
 
     /**
