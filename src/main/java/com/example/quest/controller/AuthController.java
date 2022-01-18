@@ -1,5 +1,7 @@
 package com.example.quest.controller;
 
+import com.example.quest.exception.TokenRefreshException;
+import com.example.quest.model.entity.RefreshToken;
 import com.example.quest.model.enums.ERole;
 import com.example.quest.model.entity.Role;
 import com.example.quest.model.entity.User;
@@ -8,11 +10,14 @@ import com.example.quest.model.network.request.MemberRequest;
 import com.example.quest.model.network.response.MemberResponse;
 import com.example.quest.payload.request.LoginRequest;
 import com.example.quest.payload.request.SignupRequest;
+import com.example.quest.payload.request.TokenRefreshRequest;
 import com.example.quest.payload.response.JwtResponse;
 import com.example.quest.payload.response.MessageResponse;
+import com.example.quest.payload.response.TokenRefreshResponse;
 import com.example.quest.repository.RoleRepository;
 import com.example.quest.repository.UserRepository;
 import com.example.quest.security.jwt.JwtUtils;
+import com.example.quest.security.service.RefreshTokenService;
 import com.example.quest.security.service.UserDetailsImpl;
 import com.example.quest.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +68,10 @@ public class AuthController extends BaseController<MemberRequest, MemberResponse
     @Autowired
     MemberService memberService;
 
+    //refresh 토큰 서비스 추가
+    @Autowired
+    RefreshTokenService refreshTokenService;
+
     /**
      * 로그인
      *
@@ -77,23 +86,55 @@ public class AuthController extends BaseController<MemberRequest, MemberResponse
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        //jwt refresh토큰 넣기전에 사용.
+        //        String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        String jwt = jwtUtils.generateJwtToken(userDetails);
+
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getName(),
-                userDetails.getEmail(),
-                userDetails.getPhone(),
-                userDetails.getPostCode(),
-                userDetails.getAddress(),
-                userDetails.getDetailAddress(),
-                roles));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
+        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+                userDetails.getUsername(), userDetails.getName(), userDetails.getEmail(), userDetails.getPhone(),
+                userDetails.getPostCode(), userDetails.getAddress(), userDetails.getDetailAddress(), roles));
+
+        //refresh Token 하기전에 jwt 토큰적용.
+        //        return ResponseEntity.ok(new JwtResponse(jwt,
+        //                userDetails.getId(),
+        //                userDetails.getUsername(),
+        //                userDetails.getName(),
+        //                userDetails.getEmail(),
+        //                userDetails.getPhone(),
+        //                userDetails.getPostCode(),
+        //                userDetails.getAddress(),
+        //                userDetails.getDetailAddress(),
+        //                roles));
+
+    }
+
+    //refreshToken추가.
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+
+        //요청 데이터에서 새로고침 토큰을 얻는다.
+        String requestRefreshToken = request.getRefreshToken();
+
+        //토큰에서 refreshToken개체를 가져온다.
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "REFRESH TOKEN은 데이터베이스 안에 없습니다!"));
     }
 
     /**

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -13,6 +14,7 @@ import java.util.List;
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
+    private String refreshToken;
     private Long id;
     private String username;
     private String name;
@@ -23,8 +25,9 @@ public class JwtResponse {
     private String detailAddress;
     private List<String> roles;
 
-    public JwtResponse(String accessToken, Long id, String username,String name,String email,String phone,String postCode,String address,String detailAddress, List<String> roles) {
+    public JwtResponse(String accessToken, String refreshToken, Long id, String username, String name, String email, String phone, String postCode, String address, String detailAddress, List<String> roles) {
         this.token = accessToken;
+        this.refreshToken = refreshToken;
         this.id = id;
         this.username = username;
         this.name = name;
@@ -35,6 +38,7 @@ public class JwtResponse {
         this.detailAddress = detailAddress;
         this.roles = roles;
     }
+
     public String getAccessToken() {
         return token;
     }

@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 //2.
 //OncePerRequestFilter로부터 상속받은객체
 //로그인할때 객체생성 Security의 내장객체(UserDetails)가지고 인증수행.
@@ -38,9 +39,14 @@ public class TokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             //token검사
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String userId = jwtUtils.getUserIdFromJwtToken(jwt);
+                //refresh토큰 적용.
+                String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                //refresh토큰 없을때 사용.
+                //String userId = jwtUtils.getUserIdFromJwtToken(jwt);
                 //security 내장객체 사용(UserDetails)
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                //refresh토큰 없을때 사용.
+                //UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 //실제 인증 작업을 수행해서 이상유무를 판단 후, 이상이 없으면 Authentication을 생성합니다
                 //이부분도 security 내장객체에서 수행.
                 UsernamePasswordAuthenticationToken authentication =
@@ -58,6 +64,7 @@ public class TokenFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
     //로그인 정보에 대한 Token을 “Bearer”라는 접두사를 달았고, 접두사를 제외한 나머지 정보를 가져온다.
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");

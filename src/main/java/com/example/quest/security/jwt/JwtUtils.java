@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+
 //3.
 //component:직접작성한 class를 bean으로 등록하기위한 어노테이션.
 @Component
@@ -23,21 +24,42 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     //token생성
-    public String generateJwtToken(Authentication authentication) {
+    //refresh토큰 안들어갔을때 사용.
+    //public String generateJwtToken(Authentication authentication) {
 
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    //refresh토큰 안들어갔을때 사용.
+    //UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-        return Jwts.builder()
-                .setSubject((userPrincipal.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+    //jwt 빌더생성.(refresh토큰 안들어 갔을때 사용)
+    //        return Jwts.builder()
+    //                .setSubject((userPrincipal.getUsername()))
+    //                .setIssuedAt(new Date())
+    //                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+    //                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+    //                .compact();
+
+    public String generateJwtToken(UserDetailsImpl userPrincipal) {
+        //jwt사용자 이름생성
+        return generateTokenFromUsername(userPrincipal.getUsername());
+    }
+
+    //jwt에서 사용자 이름 가져오기
+    public String generateTokenFromUsername(String username) {
+        return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-    //jwt로부터 ID획득
-    public String getUserIdFromJwtToken(String token) {
+
+    //jwt Refresh Token 사용할때 추가.
+    public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
+
+    //jwt로부터 ID획득(refresh Token 안들어 갔을때 사용.
+    //    public String getUserIdFromJwtToken(String token) {
+    //        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    //    }
+
     //유효성검사
     public boolean validateJwtToken(String authToken) {
         try {
