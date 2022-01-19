@@ -88,9 +88,6 @@ public class AuthController extends BaseController<MemberRequest, MemberResponse
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        //jwt refresh토큰 넣기전에 사용.
-        //        String jwt = jwtUtils.generateJwtToken(authentication);
-
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
@@ -137,10 +134,6 @@ public class AuthController extends BaseController<MemberRequest, MemberResponse
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
         log.info("{}", pageable);
         return baseService.pagingRead(pageable);
-    }
-
-    public String templateTest(String str, int num, boolean flag){
-        return new String("str");
     }
 
     /**
