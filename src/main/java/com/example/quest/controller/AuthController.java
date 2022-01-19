@@ -104,19 +104,6 @@ public class AuthController extends BaseController<MemberRequest, MemberResponse
         return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
                 userDetails.getUsername(), userDetails.getName(), userDetails.getEmail(), userDetails.getPhone(),
                 userDetails.getPostCode(), userDetails.getAddress(), userDetails.getDetailAddress(), roles));
-
-        //refresh Token 하기전에 jwt 토큰적용.
-        //        return ResponseEntity.ok(new JwtResponse(jwt,
-        //                userDetails.getId(),
-        //                userDetails.getUsername(),
-        //                userDetails.getName(),
-        //                userDetails.getEmail(),
-        //                userDetails.getPhone(),
-        //                userDetails.getPostCode(),
-        //                userDetails.getAddress(),
-        //                userDetails.getDetailAddress(),
-        //                roles));
-
     }
 
     //refreshToken추가.

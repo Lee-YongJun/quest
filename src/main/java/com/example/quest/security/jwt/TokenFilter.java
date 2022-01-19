@@ -41,11 +41,7 @@ public class TokenFilter extends OncePerRequestFilter {
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 //refresh토큰 적용.
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                //refresh토큰 없을때 사용.
-                //String userId = jwtUtils.getUserIdFromJwtToken(jwt);
-                //security 내장객체 사용(UserDetails)
-                //refresh토큰 없을때 사용.
-                //UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 //실제 인증 작업을 수행해서 이상유무를 판단 후, 이상이 없으면 Authentication을 생성합니다
                 //이부분도 security 내장객체에서 수행.

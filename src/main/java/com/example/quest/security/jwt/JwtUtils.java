@@ -23,21 +23,6 @@ public class JwtUtils {
     @Value("${jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    //token생성
-    //refresh토큰 안들어갔을때 사용.
-    //public String generateJwtToken(Authentication authentication) {
-
-    //refresh토큰 안들어갔을때 사용.
-    //UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-
-    //jwt 빌더생성.(refresh토큰 안들어 갔을때 사용)
-    //        return Jwts.builder()
-    //                .setSubject((userPrincipal.getUsername()))
-    //                .setIssuedAt(new Date())
-    //                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-    //                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-    //                .compact();
-
     public String generateJwtToken(UserDetailsImpl userPrincipal) {
         //jwt사용자 이름생성
         return generateTokenFromUsername(userPrincipal.getUsername());
@@ -54,11 +39,6 @@ public class JwtUtils {
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
-
-    //jwt로부터 ID획득(refresh Token 안들어 갔을때 사용.
-    //    public String getUserIdFromJwtToken(String token) {
-    //        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-    //    }
 
     //유효성검사
     public boolean validateJwtToken(String authToken) {
